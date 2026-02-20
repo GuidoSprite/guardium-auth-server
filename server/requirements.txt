@@ -1,0 +1,5 @@
+fastapi==0.109.2
+uvicorn==0.27.0.post1
+pynacl==1.5.0
+requests==2.31.0
+pydantic==2.6.1
