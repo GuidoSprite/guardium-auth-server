@@ -2,6 +2,7 @@ import os
 import json
 import base64
 import requests
+from datetime import datetime, timedelta, timezone
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from nacl.signing import SigningKey
@@ -62,6 +63,10 @@ async def activate_license(req: ActivationRequest):
     elif "immune" in variant_name:
         tier = "immune"
 
+    # Compute exactly 1 year from now
+    expiration_date = datetime.now(timezone.utc) + timedelta(days=365)
+    expiration_str = expiration_date.strftime("%Y-%m-%dT%H:%M:%SZ")
+
     # 3. Fabricate License Payload
     payload = {
         "schema": 1,
@@ -69,7 +74,7 @@ async def activate_license(req: ActivationRequest):
         "tier": tier,
         "license_id": req.license_key[:8] + "...", # Mask the actual key
         "order_id": str(order_id),
-        "expires_at": "2027-12-31T23:59:59Z", # Alternatively, check if it's a subscription on LS
+        "expires_at": expiration_str, 
         "nonce": os.urandom(8).hex()
     }
 
